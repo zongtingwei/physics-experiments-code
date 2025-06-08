@@ -1,0 +1,72 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
+
+# 新数据
+data = {
+    'H(A/m)': [-330, -315, -299, -282, -267, -250, -228, -206, -181, -155, -127, -101,
+               -74, -54, -45, -24, -35, -15, -10, -9, -21, -17, -1, -10, 3, 8, -7, 14,
+               -1, -10, 16, 3, 25, 6, 34, 36, 47, 49, 60, 73, 93.2, 117, 146, 170, 196,
+               225, 249, 273, 304, 330, 35, 16, -38, -38, 13, -21, -30, 28, 27],
+    'B(T)': [-0.199, -0.199, -0.199, -0.199, -0.199, -0.199, -0.196, -0.195, -0.195, -0.192,
+             -0.188, -0.181, -0.173, -0.158, -0.147, -0.124, -0.114, -0.105, -0.0875,
+             -0.0755, -0.0669, -0.052, -0.052, -0.038, -0.038, -0.017, -0.004, 0.01, 0.023,
+             -0.021, 0.031, 0.038, 0.046, 0.057, 0.091, 0.106, 0.129, 0.143, 0.154, 0.168,
+             0.175, 0.183, 0.188, 0.191, 0.194, 0.194, 0.196, 0.196, 0.196, 0.196, 0.136,
+             0.0962, -0.125, -0.135, 0.0783, -0.0808, -0.0958, 0.119, 0.0671]
+}
+
+# 检查数据长度是否一致
+assert len(data['H(A/m)']) == len(data['B(T)']), "数据长度不一致"
+
+# 创建 DataFrame
+df = pd.DataFrame(data)
+
+# 按照 H 的值从小到大排序
+df_sorted = df.sort_values(by='H(A/m)', ascending=True)
+
+# 重置索引
+df_sorted.reset_index(drop=True, inplace=True)
+
+# 添加序号列
+df_sorted.insert(0, '序号', range(1, len(df_sorted) + 1))
+
+# 输出到 Excel
+df_sorted.to_excel('磁滞回线数据.xlsx', index=False)
+
+print("数据已成功输出到磁滞回线数据.xlsx")
+
+# 绘制散点图
+plt.figure(figsize=(10, 10))
+plt.scatter(df_sorted['H(A/m)'], df_sorted['B(T)'], color='blue', marker='o')
+
+# 添加标题和标签（增大标题字体）
+plt.title('软磁材料样品的磁滞回线', fontsize=32, pad=20)
+
+# 调整坐标轴标签位置和字号（增大到14号）
+plt.xlabel('H (A/m)', fontsize=24, labelpad=10, loc='right')  # 右侧
+plt.ylabel('B (T)', fontsize=24, labelpad=10, loc='top')    # 顶部
+
+# 添加小刻度
+ax = plt.gca()
+ax.xaxis.set_minor_locator(AutoMinorLocator(5))
+ax.yaxis.set_minor_locator(AutoMinorLocator(5))
+
+# 设置坐标轴刻度标签的字号（新添加的关键部分）
+ax.tick_params(axis='both', which='major', labelsize=20)  # 设置主刻度标签字号为20
+
+# 设置x轴范围（最大刻度为400）
+plt.xlim(-400, 400)
+
+# 添加网格
+plt.grid(True, which='both', linestyle='--', alpha=0.7)
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 或其他支持中文的字体
+plt.rcParams['axes.unicode_minus'] = False  # 正确显示负号
+
+# 在x=0和y=0处添加粗线（不改变坐标轴位置）
+ax.axhline(y=0, color='k', linewidth=0.2)  # 水平粗线
+ax.axvline(x=0, color='k', linewidth=0.2)  # 垂直粗线
+
+# 显示图形
+plt.tight_layout()
+plt.show()
