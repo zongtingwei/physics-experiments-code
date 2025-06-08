@@ -1,0 +1,70 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
+
+# 数据
+data = {
+    'H(A/m)': [-351, -331, -313, -293, -271, -247, -222, -199, -173, -159,
+               -151, -141, -131, -122, -118, -118, -114, -107, -99, -90,
+               -81, -71, -57, -43, -37, -10, -6, 21, 23, 53,
+               56, 68, 81, 94, 100, 104, 108, 115, 115, 118,
+               132, 155, 156, 190, 234, 278, 319, 362],
+    'B(T)': [-0.601, -0.597, -0.594, -0.594, -0.590, -0.590, -0.590, -0.587, -0.577, -0.55,
+             -0.577, -0.513, -0.447, -0.397, -0.567, -0.307, -0.183, -0.083, 0.03, 0.15,
+             -0.564, 0.243, 0.32, -0.544, 0.397, 0.463, -0.503, 0.51, -0.45, -0.364,
+             0.544, -0.284, -0.204, -0.12, -0.023, 0.574, 0.073, 0.257, 0.163, 0.354,
+             0.447, 0.573, 0.534, 0.574, 0.597, 0.593, 0.597, 0.594]
+}
+
+# 检查数据长度是否一致
+assert len(data['H(A/m)']) == len(data['B(T)']), "数据长度不一致"
+
+# 创建 DataFrame
+df = pd.DataFrame(data)
+
+# 按照 H 的值从小到大排序
+df_sorted = df.sort_values(by='H(A/m)', ascending=True)
+
+# 重置索引
+df_sorted.reset_index(drop=True, inplace=True)
+
+# 添加序号列
+df_sorted.insert(0, '序号', range(1, len(df_sorted) + 1))
+
+# 输出到 Excel
+df_sorted.to_excel('磁滞回线数据.xlsx', index=False)
+
+print("数据已成功输出到磁滞回线数据.xlsx")
+
+# 绘制散点图
+plt.figure(figsize=(10, 10))
+plt.scatter(df_sorted['H(A/m)'], df_sorted['B(T)'], color='blue', marker='o')
+
+# 添加标题和标签（增大标题字体）
+plt.title('硬磁材料样品的磁滞回线', fontsize=32, pad=20)
+
+plt.xlabel('H (A/m)', fontsize=24, labelpad=10, loc='right')  # 右侧
+plt.ylabel('B (T)', fontsize=24, labelpad=10, loc='top')    # 顶部
+
+# 添加小刻度
+ax = plt.gca()
+ax.xaxis.set_minor_locator(AutoMinorLocator(5))
+ax.yaxis.set_minor_locator(AutoMinorLocator(5))
+
+plt.xlim(-400, 400)
+plt.ylim(-0.8, 0.8)
+
+ax.tick_params(axis='both', which='major', labelsize=20)
+
+# 添加网格
+plt.grid(True, which='both', linestyle='--', alpha=0.7)
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 或其他支持中文的字体
+plt.rcParams['axes.unicode_minus'] = False  # 正确显示负号
+
+# 在x=0和y=0处添加粗线（不改变坐标轴位置）
+ax.axhline(y=0, color='k', linewidth=0.2)  # 水平粗线
+ax.axvline(x=0, color='k', linewidth=0.2)  # 垂直粗线
+
+# 显示图形
+plt.tight_layout()
+plt.show()
